@@ -1,10 +1,19 @@
 #ifndef GRAFO_H_
 #define GRAFO_H_
 
+#include <sstream>
 #include <string>
+#include <list>
+#include <vector>
+#include "GeneradorIdentificador.h"
 using std::string;
+using std::vector;
+using std::list;
 
 namespace URGGrafo{
+
+	enum TipoGrafo { DIRIGIDO, NODIRIGIDO };
+	
 	struct Grafo;
 
 	/*
