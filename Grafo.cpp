@@ -318,8 +318,11 @@ Grafo* ObtenerGrafoComplementario(const Grafo* grafo){
 	 * Postcondiciones: Cambia el nombre que tiene @grafo por @nombre
 	 */
 	void CambiarNombre(Grafo* grafo, string nombre){
-        
-    }
+		if (!grafo) {
+			return;
+		}
+		grafo->nombre = nombre;     
+	}
 
 	/*
 	* Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
