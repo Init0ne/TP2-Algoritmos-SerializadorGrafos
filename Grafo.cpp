@@ -176,7 +176,53 @@ namespace URGGrafo {
 	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
 	 * Postcondiciones: Devuelve una instancia nueva del Grafo que es el complemento de @grafo
 	 */
-	Grafo* ObtenerGrafoComplementario(const Grafo* grafo){
+Grafo* ObtenerGrafoComplementario(const Grafo* grafo){
+Grafo* ObtenerUnion(const Grafo* grafo1, const Grafo* grafo2) {
+	if (grafo1->tipo != grafo2->tipo) {
+		return nullptr; 
+	}
+	Grafo* grafoUnion = new Grafo;
+	grafoUnion->nombre = "Union_" + grafo1->nombre + "_" + grafo2->nombre;
+	grafoUnion->id = GenerarIdentificadorUnico();  
+	grafoUnion->tipo = grafo1->tipo;
+
+	grafoUnion->cantidadVertices = std::max(grafo1->cantidadVertices, grafo2->cantidadVertices);
+	grafoUnion->listaAdyacencia.resize(grafoUnion->cantidadVertices);
+	for (int indiceVerticeGrafo1 = 0; indiceVerticeGrafo1 < grafo1->cantidadVertices; ++indiceVerticeGrafo1) {
+		for (int verticeAdyacente : grafo1->listaAdyacencia[indiceVerticeGrafo1]) {
+			grafoUnion->listaAdyacencia[indiceVerticeGrafo1].push_back(verticeAdyacente);
+		}
+	}
+
+	if (grafoUnion->tipo == DIRIGIDO) {
+		for (int indiceVerticeGrafo2 = 0; indiceVerticeGrafo2 < grafo2->cantidadVertices; ++indiceVerticeGrafo2) {
+			for (int verticeAdyacente : grafo2->listaAdyacencia[indiceVerticeGrafo2]) {
+				grafoUnion->listaAdyacencia[indiceVerticeGrafo2].push_back(verticeAdyacente);
+			}
+		}
+	}
+
+	else {
+		vector<vector<bool>> aristaAgregada (grafoUnion->cantidadVertices, vector<bool>(grafoUnion->cantidadVertices, false));
+
+		for (int indiceVerticeGrafo1 = 0; indiceVerticeGrafo1 < grafo1->cantidadVertices; ++indiceVerticeGrafo1) {
+			for (int verticeAdyacente : grafo1->listaAdyacencia[indiceVerticeGrafo1]) {
+				aristaAgregada [indiceVerticeGrafo1][verticeAdyacente] = aristaAgregada [verticeAdyacente][indiceVerticeGrafo1] = true;
+			}
+
+		for (int indiceVerticeGrafo2 = 0; indiceVerticeGrafo2 < grafo2->cantidadVertices; ++indiceVerticeGrafo2) {
+			for (int verticeAdyacente : grafo2->listaAdyacencia[indiceVerticeGrafo2]) {
+				if (!aristaAgregada[indiceVerticeGrafo2][verticeAdyacente]) {
+					grafoUnion->listaAdyacencia[indiceVerticeGrafo2].push_back(verticeAdyacente);
+					aristaAgregada [indiceVerticeGrafo2][verticeAdyacente] = aristaAgregada [verticeAdyacente][indiceVerticeGrafo2] = true;
+				}
+			}
+		}
+	}
+
+	return grafoUnion;
+
+
 
     }
 
