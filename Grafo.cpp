@@ -1,7 +1,14 @@
 #include "Grafo.h"
 #include "GeneradorIdentificador.h"
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>  // Para std::max
+#include <unordered_map>
 
 using namespace URGGeneradorIdentificador;
+using namespace std;
+using namespace URGGrafo;
 
 namespace URGGrafo {
 	struct Grafo {
@@ -164,30 +171,38 @@ namespace URGGrafo {
 		return resultado;
 	}
 
+	/*
+ * Precondiciones:
+ * - @nombre es un nombre válido para el grafo.
+ * - @tipo es un valor de TipoGrafo (DIRIGIDO o NODIRIGIDO).
+ * - @cantidadVertices es mayor o igual a cero.
+ *
+ * Postcondiciones:
+ * - Devuelve un puntero a un nuevo Grafo inicializado con el nombre, tipo, identificador único, y lista de adyacencia de tamaño @cantidadVertices.
+ */
+	Grafo* InicializarGrafo(const string& nombre, TipoGrafo tipo, int cantidadVertices) {
+		Grafo* nuevoGrafo = new Grafo;
+		nuevoGrafo->nombre = nombre;
+		nuevoGrafo->id = GenerarIdentificadorUnico();
+		nuevoGrafo->tipo = tipo;
+		nuevoGrafo->cantidadVertices = cantidadVertices;
+		nuevoGrafo->listaAdyacencia.resize(cantidadVertices);
+
+		return nuevoGrafo;
+	}
+
     /*
 	 * Precondiciones: @grafo1 y @grafo2 son instancias validas creadas con alguna de las primitivas creacionales
 	 * Postcondiciones: Devuelve una instancia nueva de Grafo que es la union de conjuntos de los vertices y aristas de @grafo1 y @grafo2
 	 */
 	Grafo* ObtenerUnion(const Grafo* grafo1, const Grafo* grafo2){
-
-    }
-
-    /*
-	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
-	 * Postcondiciones: Devuelve una instancia nueva del Grafo que es el complemento de @grafo
-	 */
-Grafo* ObtenerGrafoComplementario(const Grafo* grafo){
-Grafo* ObtenerUnion(const Grafo* grafo1, const Grafo* grafo2) {
 	if (grafo1->tipo != grafo2->tipo) {
-		return nullptr; 
+		return nullptr;
 	}
-	Grafo* grafoUnion = new Grafo;
-	grafoUnion->nombre = "Union_" + grafo1->nombre + "_" + grafo2->nombre;
-	grafoUnion->id = GenerarIdentificadorUnico();  
-	grafoUnion->tipo = grafo1->tipo;
 
-	grafoUnion->cantidadVertices = std::max(grafo1->cantidadVertices, grafo2->cantidadVertices);
-	grafoUnion->listaAdyacencia.resize(grafoUnion->cantidadVertices);
+	Grafo* grafoUnion = InicializarGrafo("Union_" + grafo1->nombre + "_" + grafo2->nombre, grafo1->tipo,
+		std::max(grafo1->cantidadVertices, grafo2->cantidadVertices));
+
 	for (int indiceVerticeGrafo1 = 0; indiceVerticeGrafo1 < grafo1->cantidadVertices; ++indiceVerticeGrafo1) {
 		for (int verticeAdyacente : grafo1->listaAdyacencia[indiceVerticeGrafo1]) {
 			grafoUnion->listaAdyacencia[indiceVerticeGrafo1].push_back(verticeAdyacente);
@@ -203,28 +218,56 @@ Grafo* ObtenerUnion(const Grafo* grafo1, const Grafo* grafo2) {
 	}
 
 	else {
-		vector<vector<bool>> aristaAgregada (grafoUnion->cantidadVertices, vector<bool>(grafoUnion->cantidadVertices, false));
+		vector<vector<bool>> aristaAgregada(grafoUnion->cantidadVertices, vector<bool>(grafoUnion->cantidadVertices, false));
 
 		for (int indiceVerticeGrafo1 = 0; indiceVerticeGrafo1 < grafo1->cantidadVertices; ++indiceVerticeGrafo1) {
 			for (int verticeAdyacente : grafo1->listaAdyacencia[indiceVerticeGrafo1]) {
-				aristaAgregada [indiceVerticeGrafo1][verticeAdyacente] = aristaAgregada [verticeAdyacente][indiceVerticeGrafo1] = true;
+				aristaAgregada[indiceVerticeGrafo1][verticeAdyacente] = aristaAgregada[verticeAdyacente][indiceVerticeGrafo1] = true;
 			}
 
-		for (int indiceVerticeGrafo2 = 0; indiceVerticeGrafo2 < grafo2->cantidadVertices; ++indiceVerticeGrafo2) {
-			for (int verticeAdyacente : grafo2->listaAdyacencia[indiceVerticeGrafo2]) {
-				if (!aristaAgregada[indiceVerticeGrafo2][verticeAdyacente]) {
-					grafoUnion->listaAdyacencia[indiceVerticeGrafo2].push_back(verticeAdyacente);
-					aristaAgregada [indiceVerticeGrafo2][verticeAdyacente] = aristaAgregada [verticeAdyacente][indiceVerticeGrafo2] = true;
+			for (int indiceVerticeGrafo2 = 0; indiceVerticeGrafo2 < grafo2->cantidadVertices; ++indiceVerticeGrafo2) {
+				for (int verticeAdyacente : grafo2->listaAdyacencia[indiceVerticeGrafo2]) {
+					if (!aristaAgregada[indiceVerticeGrafo2][verticeAdyacente]) {
+						grafoUnion->listaAdyacencia[indiceVerticeGrafo2].push_back(verticeAdyacente);
+						aristaAgregada[indiceVerticeGrafo2][verticeAdyacente] = aristaAgregada[verticeAdyacente][indiceVerticeGrafo2] = true;
+					}
+				}
+			}
+		}
+
+		return grafoUnion;
+
+	}
+
+    }
+
+    /*
+	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
+	 * Postcondiciones: Devuelve una instancia nueva del Grafo que es el complemento de @grafo
+	 */
+Grafo* ObtenerGrafoComplementario(const Grafo* grafo){
+	Grafo* ObtenerGrafoComplementario(const Grafo* grafo) {
+	if (!grafo) {
+		return nullptr;  
+	}
+
+	Grafo* grafoComplementario = InicializarGrafo("Complemento_" + grafo->nombre, grafo->tipo, grafo->cantidadVertices);
+
+	for (int verticeOrigen = 0; verticeOrigen < grafo->cantidadVertices; ++verticeOrigen) {
+		for (int verticeDestino = 0; verticeDestino < grafo->cantidadVertices; ++verticeDestino) {
+			if (grafo->tipo == DIRIGIDO || verticeDestino > verticeOrigen) {
+				if (!SonAdyacentes(grafo, verticeOrigen, verticeDestino)) {
+					grafoComplementario->listaAdyacencia[verticeOrigen].push_back(verticeDestino);
+					if (grafo->tipo == NODIRIGIDO) {
+						grafoComplementario->listaAdyacencia[verticeDestino].push_back(verticeOrigen);
+					}
 				}
 			}
 		}
 	}
 
-	return grafoUnion;
-
-
-
-    }
+	return grafoComplementario;
+}
 
     /*
 	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
@@ -238,9 +281,13 @@ Grafo* ObtenerUnion(const Grafo* grafo1, const Grafo* grafo2) {
 	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
 	 * Postcondiciones: Asocia la etiqueta @etiqueta al vertive @vertice de @grafo. Si ya tenia etiqueta la sobreescribe por @etiqueta
 	 */
+	unordered_map<const Grafo*, unordered_map<int, string>> etiquetasVertices;
 	void AgregarEtiqueta(Grafo* grafo, int vertice, string etiqueta){
-
-    }
+	if (!grafo || vertice < 0 || vertice >= grafo->cantidadVertices) {
+		return; 
+	}
+	etiquetasVertices[grafo][vertice] = etiqueta;
+	}
 
     /*
 	 * Precondiciones: @grafo es una instancia valida creada con alguna de las primitivas creacionales
