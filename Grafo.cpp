@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>  // Para std::max
 #include <unordered_map>
+#include <sstream>
 
 using namespace URGGeneradorIdentificador;
 using namespace std;
@@ -274,7 +275,17 @@ namespace URGGrafo {
 	 * Postcondiciones: Si es @grafo es un grafo no dirigido devuelve el grado del vertice @vertice. Si es un grafo dirigido, devuelve el grado de salida de @vertice
 	 */
 	int ObtenerGrado(const Grafo* grafo, int vertice) {
+		int grado = -1;
+		if (grafo && vertice >= 0 && vertice < grafo->cantidadVertices) {
+			if (grafo->tipo == NODIRIGIDO) {
+				grado = grafo->listaAdyacencia[vertice].size();
+			}
+			else if (grafo->tipo == DIRIGIDO) {
+				grado = grafo->listaAdyacencia[vertice].size();
 
+			}
+		}
+		return grado;
 	}
 
 	/*
@@ -294,7 +305,22 @@ namespace URGGrafo {
 	 * Postcondiciones: Devuelve true si @grafo es un grafo completo. Caso contrario devuelve false
 	 */
 	bool EsCompleto(const Grafo* grafo) {
+		if (grafo == nullptr) {
+			return false;
+		}
 
+		int numVertices = grafo->cantidadVertices;
+
+		for (int verticeOrigen = 0; verticeOrigen < numVertices; ++verticeOrigen) {
+			for (int verticeDestino = 0; verticeDestino < numVertices; ++verticeDestino) {
+				if (verticeOrigen != verticeDestino) {
+					if (!SonAdyacentes(grafo, verticeOrigen, verticeDestino)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	/*
@@ -302,7 +328,40 @@ namespace URGGrafo {
 	 * Postcondiciones: Devuelve la sucesion grafica de @grafo separados por coma
 	 */
 	string ObtenerSucesionGrafica(const Grafo* grafo) {
+		// Verifica si el puntero al grafo es nulo
+		if (!grafo) {
+			return "";
+		}
 
+		std::vector<int> grados;
+
+		// Calcular el grado de cada vértice y agregarlo al vector de grados
+		for (int i = 0; i < grafo->cantidadVertices; ++i) {
+			int grado = 0;
+
+			// Contar cuántos vértices están conectados al vértice actual
+			for (int j = 0; j < grafo->cantidadVertices; ++j) {
+				if (i != j && SonAdyacentes(grafo, i, j)) {
+					++grado;
+				}
+			}
+
+			grados.push_back(grado);
+		}
+
+		// Ordenar los grados en orden descendente
+		std::sort(grados.begin(), grados.end(), std::greater<int>());
+
+		// Convertir el vector de grados a un string separado por comas
+		std::ostringstream resultado;
+		for (size_t i = 0; i < grados.size(); ++i) {
+			resultado << grados[i];
+			if (i != grados.size() - 1) {
+				resultado << ",";
+			}
+		}
+
+		return resultado.str();
 	}
 
 	/*
