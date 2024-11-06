@@ -5,12 +5,13 @@
 #include <random>
 #include <string>
 #include <vector>
+using namespace URGGrafo;
 
 
 using namespace std;
 using URGGrafo::Grafo;
 
-namespace URGGeneradorGrafos{
+namespace URGGeneradorGrafos {
 	/*
 	 * Precondicion: ninguna
 	 * Postcondicion: Devuelve una instancia nueva de grafo con las siguientes caracteristicas
@@ -18,7 +19,7 @@ namespace URGGeneradorGrafos{
 	 * - La cantidad de vertices del grafo es @vertices
 	 * - El tope maximo de aristas del grafo sera @maximaCantidadAristas y estas deben ser aleatorias
 	 */
-	Grafo* ObtenerGrafoRandom(unsigned int vertices, int maximaCantidadAristas =0);
+	Grafo* ObtenerGrafoRandom(unsigned int vertices, int maximaCantidadAristas = 0);
 
 	/*
 	 * Precondicion: ninguna
@@ -43,59 +44,60 @@ namespace URGGeneradorGrafos{
 	 */
 	Grafo* ObtenerGrafoPetersen();
 
-//FALTA 
-Grafo* ObtenerGrafoRandom(unsigned int vertices, int maximaCantidadAristas =0){
-  
+	//FALTA 
+	Grafo* ObtenerGrafoRandom(unsigned int vertices, int maximaCantidadAristas = 0) {
+
+	}
+
+
+	Grafo* ObtenerGrafoCompleto(unsigned int vertices) {
+
+		string nombre = "completo_" + std::to_string(vertices);
+		Grafo* grafo = CrearGrafoNoDirigido(nombre, vertices);
+
+		for (unsigned int verticeOrigen = 0; verticeOrigen < vertices; ++verticeOrigen) {
+			for (unsigned int verticeDestino = verticeOrigen + 1; verticeDestino < vertices; ++verticeDestino) {
+				Conectar(grafo, verticeOrigen, verticeDestino);
+			}
+		}
+
+		return grafo;
+	}
+
+
+	//FALTA 
+	Grafo* ObtenerGrafoProvinciasArgentina() {}
+
+
+	Grafo* ObtenerGrafoPetersen() {
+		string nombre = "petersen";
+		Grafo* grafo = CrearGrafoNoDirigido(nombre, 10);
+
+
+		Conectar(grafo, 0, 1);
+		Conectar(grafo, 1, 2);
+		Conectar(grafo, 2, 3);
+		Conectar(grafo, 3, 4);
+		Conectar(grafo, 4, 0);
+
+
+		Conectar(grafo, 5, 7);
+		Conectar(grafo, 7, 9);
+		Conectar(grafo, 9, 6);
+		Conectar(grafo, 6, 8);
+		Conectar(grafo, 8, 5);
+
+
+		Conectar(grafo, 0, 5);
+		Conectar(grafo, 1, 6);
+		Conectar(grafo, 2, 7);
+		Conectar(grafo, 3, 8);
+		Conectar(grafo, 4, 9);
+
+		return grafo;
+	}
+
+
+
 }
-
-
-Grafo* ObtenerGrafoCompleto(unsigned int vertices) {
-    
-    string nombre = "completo_" + std::to_string(vertices);
-    Grafo* grafo = CrearGrafoNoDirigido(nombre, vertices);
-
-    for (unsigned int verticeOrigen = 0; verticeOrigen < vertices; ++verticeOrigen) {
-        for (unsigned int verticeDestino = verticeOrigen + 1; verticeDestino < vertices; ++verticeDestino) {
-            Conectar(grafo, verticeOrigen, verticeDestino);
-        }
-    }
-
-    return grafo;
-}
-
-
-//FALTA 
-Grafo* ObtenerGrafoProvinciasArgentina(){}
-
-
-Grafo* ObtenerGrafoPetersen() {
-    string nombre = "petersen";
-    Grafo* grafo = CrearGrafoNoDirigido(nombre, 10);
-
-    
-    Conectar(grafo, 0, 1);
-    Conectar(grafo, 1, 2);
-    Conectar(grafo, 2, 3);
-    Conectar(grafo, 3, 4);
-    Conectar(grafo, 4, 0);
-
-    
-    Conectar(grafo, 5, 7);
-    Conectar(grafo, 7, 9);
-    Conectar(grafo, 9, 6);
-    Conectar(grafo, 6, 8);
-    Conectar(grafo, 8, 5);
-
-    
-    Conectar(grafo, 0, 5);
-    Conectar(grafo, 1, 6);
-    Conectar(grafo, 2, 7);
-    Conectar(grafo, 3, 8);
-    Conectar(grafo, 4, 9);
-
-    return grafo;
-}
-
-
-
-}
+#endif
