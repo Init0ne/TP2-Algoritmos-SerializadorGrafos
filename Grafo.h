@@ -131,6 +131,17 @@ namespace URGGrafo{
 	 * Postcondiciones: Libera todos los recursos asociados a @grafo
 	 */
 	void DestruirGrafo(Grafo* grafo);
+
+	/*
+	* Precondiciones:
+	* - @nombre es un nombre válido para el grafo.
+	* - @tipo es un valor de TipoGrafo (DIRIGIDO o NODIRIGIDO).
+	* - @cantidadVertices es mayor o igual a cero.
+	*
+	* Postcondiciones:
+	* - Devuelve un puntero a un nuevo Grafo inicializado con el nombre, tipo, identificador único, y lista de adyacencia de tamaño @cantidadVertices.
+	*/
+	Grafo* InicializarGrafo(const string& nombre, TipoGrafo tipo, int cantidadVertices);
 }
 
 #endif
